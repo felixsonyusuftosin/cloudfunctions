@@ -1,0 +1,18 @@
+{
+  "plugins": [
+    "@babel/plugin-transform-runtime",
+    [
+      "module-resolver",
+      {
+        "alias": {
+          "@middleware": "./functions/middleware",
+          "@index": "./functions/index.js",
+          "@routes":"./functions/routes",
+          "@utils": "./functions/utils",
+          "@controllers": "./functions/controllers"
+        }
+      }
+    ]
+  ],
+  "presets": ["@babel/preset-env"]
+}
