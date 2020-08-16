@@ -1,7 +1,7 @@
 const  admin = require('firebase-admin')
 const { permission  } = require('../utils')
 
-const revokeAccess = async (req, res) => {
+const grantPermission = async (req, res) => {
   const { body } = req
   const { uid } = body
   if (!uid) {
@@ -11,8 +11,8 @@ const revokeAccess = async (req, res) => {
     const user = await admin.auth().getUser(uid)
     const newUser = { ...user }
     delete newUser.uid
-    await admin.auth().setCustomUserClaims(uid, { permissions: [permission.revoked ]  })
-    return res.send({ message: 'updated user successfully ' })
+    await admin.auth().setCustomUserClaims(uid, { permissions: [permission.basic ]  })
+    return res.send({ message: 'reset permissions successfully ' })
   } catch (eer) {
     console.error(err)
     return res.status(500).send('could not update this account')
@@ -20,5 +20,5 @@ const revokeAccess = async (req, res) => {
 }
 
 module.exports = { 
-  revokeAccess
+  grantPermission 
 }

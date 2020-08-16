@@ -4,9 +4,10 @@ const { permission } = require('../utils')
 const getTokenValue = async req => {
   const { authorization } = req.headers
   const split = authorization.split('Bearer ')
-  const token = split[1]
+  const token = split[1].trim()
   try {
     const decodedToken = await admin.auth().verifyIdToken(token)
+
     return decodedToken
   } catch (err) {
     console.error(err)
@@ -17,6 +18,7 @@ const getTokenValue = async req => {
 const isAuthenticated = async (req, res, next) => {
   const { authorization } = req.headers
   if (!authorization) {
+    console.log(' no authorization header')
     return res.status(401).send({ message: 'Unauthorized' })
   }
   if (!authorization.startsWith('Bearer'))
@@ -24,7 +26,7 @@ const isAuthenticated = async (req, res, next) => {
   const split = authorization.split('Bearer ')
   if (split.length !== 2)
     return res.status(401).send({ message: 'Unauthorized' })
-  const token = split[1]
+  const token = split[1].trim()
   try {
     const decodedToken = await admin.auth().verifyIdToken(token)
     res.locals = {
@@ -40,21 +42,32 @@ const isAuthenticated = async (req, res, next) => {
   }
 }
 const isAdmin = async (req, res, next) => {
-  const { permissions = [] } = (await getTokenValue(req)) || {}
+  const { email } = await getTokenValue(req) || {}
+  if (!email) {
+    return res.status(401).send({ message: 'Unauthorized' })
+  }
+  const { customClaims } =  await admin.auth().getUserByEmail(email) || {}
+  const { permissions = [] } = customClaims ||  { }
   if (!permissions.length) {
     return res.status(401).send({ message: 'Unauthorized' })
   }
-  if (!permisions.include(permission.admin)) {
+  if (!permissions.includes(permission.admin)) {
     return res.status(409).send({ message: 'Not Permited' })
   }
   return next()
 }
 const isSuperAdmin = async (req, res, next) => {
-  const { permissions = [] } = (await getTokenValue(req)) || {}
+  const { email } = await getTokenValue(req) || {}
+  if (!email) {
+    return res.status(401).send({ message: 'Unauthorized' })
+  }
+
+  const { customClaims } =  await admin.auth().getUserByEmail(email) || {}
+  const { permissions = [] } = customClaims || { }
   if (!permissions.length) {
     return res.status(401).send({ message: 'Unauthorized' })
   }
-  if (!permisions.include(permission.superAdmin)) {
+  if (!permissions.includes(permission.superAdmin)) {
     return res.status(409).send({ message: 'Not Permited' })
   }
   return next()

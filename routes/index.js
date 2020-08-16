@@ -1,24 +1,32 @@
-const express = reuqire('express')
+const express = require('express')
 const {
   createUser,
   listUsers,
   deleteUser,
   revokeAccess,
-  createBulkUsers
+  createBulkUsers,
+  grantPermission,
+  sendActivationMail
 } = require('../controllers')
 const { isAdmin, isSuperAdmin, isAuthenticated } = require('../middleware')
 
 const routes = express.Router()
 
 routes.post('/creatuser', createUser)
-routes.get('/listusers', isAuthenticated, isSuperAdmin, isAdmin, listUsers)
-routes.delete('/deleteuser', isAuthenticated, isSuperAdmin, isAdmin, deleteUser)
+routes.get('/listusers',  isAuthenticated, isSuperAdmin, listUsers)
+routes.delete('/deleteuser', isAuthenticated, isSuperAdmin, deleteUser)
 routes.patch(
-  '/revokeAccess',
+  '/revokeaccess',
   isAuthenticated,
-  isAdmin,
   isSuperAdmin,
   revokeAccess
+)
+routes.post('/sendactivation', isAuthenticated, isSuperAdmin, sendActivationMail)
+routes.patch(
+  '/replaceaccess',
+  isAuthenticated,
+  isSuperAdmin,
+  grantPermission
 )
 routes.post('createbulkusers', isAuthenticated, isSuperAdmin, createBulkUsers)
 
