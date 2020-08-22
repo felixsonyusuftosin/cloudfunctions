@@ -17,7 +17,7 @@ module.exports.createBulkUsers = async (req, res) => {
     if (errors && errors.length) {
       return res.send({
         message: 'success',
-        info: `${errors.length} Could not be importee`,
+        info: `${errors.length} Could not be imported`,
         detials: errors
       })
     } else {

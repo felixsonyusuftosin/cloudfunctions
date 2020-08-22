@@ -6,14 +6,16 @@ const { sendEmail } = require('../utils/email.service')
 
 module.exports.createUser = async (req, res) => {
   const { body } = req
-  const { email, password, permissions: bodyPermissions = [] } = body
-  if (!email || !password) {
+  const { email, permissions: bodyPermissions = [] } = body
+  if (!email) {
     return res.status(400).send('Incomplete credentials ')
   }
   const tokenAsPassword = uuid()
   const newBody = { ...body }
-  delete newBody.password
-  newBody.password = tokenAsPassword
+  if (!bodyPermissions.includes(permission.superAdmin)) {
+     newBody.password && delete newBody.password
+     newBody.password = tokenAsPassword
+  }
 
   try {
     const { uid } = await admin.auth().createUser({ ...newBody })
@@ -35,6 +37,6 @@ module.exports.createUser = async (req, res) => {
     console.error(err)
     return res
       .status(500)
-      .send('Hey we could not create that user an unexperced error occoured')
+      .send('Hey we could not create that user an unexpected error occoured')
   }
 }

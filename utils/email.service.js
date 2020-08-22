@@ -10,15 +10,14 @@ const emailTemplate = (email, token) => {
     `
 }
 const sendEmail = async ({ from, to, subject, email, token }) => {
-  let testAccount = await nodemailer.createTestAccount();
 const transporter = nodemailer.createTransport({
-  // host: 'smtp.ethereal.email',
+  // host: 'smtp.office365.com',
   // port: 587,
-  // secure: false,
+  // secureConnection: false,
   service: 'Gmail',
   auth: {
-    user: 'XXX',
-    pass: 'XXXX'
+    user: 'copbotdonotreply@gmail.com',
+    pass: 'ted!12345!'
   }
 })
   try {
@@ -28,6 +27,7 @@ const transporter = nodemailer.createTransport({
       subject,
       html: emailTemplate(email, token)
     })
+    console.log('sent email')
     return true
   } catch (err) {
     console.error(err)
